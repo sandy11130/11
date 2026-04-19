@@ -1,6 +1,7 @@
 import { Composition, AbsoluteFill } from "remotion";
 import { CoolDemo } from "./Demo";
 import { XiaoYiVideo } from "./XiaoYiVideo";
+import { MyelcVideo } from "./myelc/MyelcVideo";
 
 const XiaoYiWhiteBg: React.FC = () => (
   <AbsoluteFill style={{ background: "#ffffff" }}>
@@ -31,6 +32,14 @@ export const RemotionRoot: React.FC = () => {
         id="XiaoYiPreview"
         component={XiaoYiWhiteBg}
         durationInFrames={2940}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="MyelcStandalone"
+        component={MyelcVideo}
+        durationInFrames={670}
         fps={30}
         width={1080}
         height={1920}
