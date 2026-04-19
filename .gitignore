@@ -1,5 +1,4 @@
 node_modules/
 .remotion/
 *.mov
-*.webm
 .env
