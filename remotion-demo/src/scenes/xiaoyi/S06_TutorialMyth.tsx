@@ -1,69 +1,70 @@
-import { useCurrentFrame, interpolate } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { xy, xt, xf } from "../../xiaoyiStyles";
-import { FlyIn, PopIn } from "../../components/XiaoYiOverlay";
+import { Flash } from "../../components/XiaoYiOverlay";
 
-const jargon = ["终端", "环境变量", "pip install", "sudo", "配置文件", "PATH", "虚拟环境", "npm", "node版本", "依赖冲突"];
+const JARGON = ["终端", "环境变量", "pip install", "sudo rm -rf", "PATH", "node版本", "虚拟环境", "npm ci", "依赖冲突", "git clone", "chmod", "brew install"];
 
 export const S06_TutorialMyth: React.FC = () => {
   const frame = useCurrentFrame();
-  const chaos = interpolate(frame, [0, 20], [1, 1], { extrapolateRight: "clamp" });
-  const clear = interpolate(frame, [30, 45], [0, 1], { extrapolateRight: "clamp" });
+  const { fps } = useVideoConfig();
+
+  const chaosOp = interpolate(frame, [0, 10, 100, 120], [0, 1, 1, 0], { extrapolateRight: "clamp" });
+  const clearOp = interpolate(frame, [120, 138], [0, 1], { extrapolateRight: "clamp" });
+  const clearS = spring({ frame: Math.max(0, frame - 120), fps, from: 0.6, to: 1, durationInFrames: 22, config: { damping: 12 } });
 
   return (
-    <div style={{
-      width: "100%", height: "100%",
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      padding: "0 60px",
-    }}>
-      <FlyIn delay={0} from="top">
-        <div style={{ ...xt.h2, color: xy.black, textAlign: "center", marginBottom: 20 }}>
-          误区②<br />
-          <span style={{ color: xy.red }}>教程写得像"神仙视角"</span>
-        </div>
-      </FlyIn>
+    <AbsoluteFill style={{ background: xy.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <Flash triggerFrame={118} color="#ffffff" />
+
+      {/* Header */}
+      <div style={{ ...xt.h2, color: xy.red, fontSize: 52, marginBottom: 30, textShadow: `0 0 20px ${xy.red}` }}>
+        ❌ 误区② 教程像天书
+      </div>
 
       {/* Chaos jargon cloud */}
-      <div style={{
-        position: "relative", width: 380, height: 240,
-        opacity: interpolate(frame, [0, 12, 30, 42], [0, 1, 1, 0], { extrapolateRight: "clamp" }),
-      }}>
-        {jargon.map((word, i) => (
-          <div key={word} style={{
-            position: "absolute",
-            left: `${(i * 137 + 20) % 65}%`,
-            top: `${(i * 97 + 10) % 75}%`,
-            ...xt.sm, color: i % 3 === 0 ? xy.red : xy.darkGray,
-            fontSize: 18 + (i % 3) * 4,
-            fontWeight: i % 2 === 0 ? 700 : 500,
-            opacity: 0.7 + (i % 3) * 0.1,
-          }}>{word}</div>
-        ))}
-        {/* Red X overlay */}
+      <div style={{ position: "relative", width: "100%", height: 500, opacity: chaosOp }}>
+        {JARGON.map((word, i) => {
+          const drift = Math.sin(frame * 0.05 + i) * 12;
+          const drift2 = Math.cos(frame * 0.04 + i * 1.3) * 8;
+          return (
+            <div key={word} style={{
+              position: "absolute",
+              left: `${(i * 119 + 5) % 68}%`,
+              top: `${(i * 83 + 8) % 80}%`,
+              transform: `translate(${drift}px, ${drift2}px) rotate(${(i * 23) % 30 - 15}deg)`,
+              ...xt.body,
+              fontFamily: xf.sans,
+              color: i % 3 === 0 ? xy.red : i % 3 === 1 ? xy.orange : xy.whiteMid,
+              fontSize: 28 + (i % 3) * 8,
+              fontWeight: 700,
+              textShadow: i % 3 === 0 ? `0 0 10px ${xy.red}` : "none",
+              opacity: 0.6 + (i % 3) * 0.15,
+            }}>{word}</div>
+          );
+        })}
+        {/* Big X */}
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <div style={{
-            fontSize: 100, color: xy.red, fontWeight: 900, opacity: 0.25,
-          }}>✕</div>
+          <div style={{ fontSize: 200, opacity: 0.15, color: xy.red, fontWeight: 900 }}>✕</div>
         </div>
       </div>
 
-      {/* Solution card */}
-      <div style={{ opacity: clear, transform: `translateY(${(1 - clear) * 30}px)`, width: "100%" }}>
-        <div style={{
-          background: xy.green, borderRadius: 24,
-          padding: "28px 36px", textAlign: "center",
-          boxShadow: "0 8px 32px rgba(29,185,84,0.25)",
-        }}>
-          <div style={{ fontSize: 44, marginBottom: 8 }}>✅</div>
-          <div style={{ ...xt.h3, color: xy.white }}>本教程默认你什么都不懂</div>
-          <div style={{ ...xt.body, color: "rgba(255,255,255,0.85)", marginTop: 8 }}>
-            不用懂配置 · 不用懂技术 · 跟着做就行
-          </div>
+      {/* Clean solution */}
+      <div style={{
+        opacity: clearOp, transform: `scale(${clearS})`,
+        position: "absolute", bottom: 140,
+        background: xy.green, borderRadius: 24,
+        padding: "28px 56px", textAlign: "center",
+        boxShadow: `0 0 60px ${xy.green}88`,
+        margin: "0 40px",
+      }}>
+        <div style={{ ...xt.h2, color: xy.bg, fontSize: 50 }}>✅ 跟着我做就行！</div>
+        <div style={{ ...xt.body, color: "rgba(0,0,0,0.7)", marginTop: 8, fontSize: 30 }}>
+          不用懂配置 · 不用懂技术
         </div>
       </div>
-    </div>
+    </AbsoluteFill>
   );
 };

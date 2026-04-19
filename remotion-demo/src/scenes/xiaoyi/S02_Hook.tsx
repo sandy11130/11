@@ -1,62 +1,53 @@
-import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { xy, xt } from "../../xiaoyiStyles";
-import { FlyIn, PopIn } from "../../components/XiaoYiOverlay";
-
-const CountUp: React.FC<{ target: number; prefix?: string; suffix?: string; delay: number; color?: string }> = ({
-  target, prefix = "", suffix = "", delay, color = xy.red,
-}) => {
-  const frame = useCurrentFrame();
-  const t = Math.max(0, frame - delay);
-  const val = Math.round(interpolate(t, [0, 35], [0, target], {
-    extrapolateRight: "clamp",
-    easing: (x) => 1 - Math.pow(1 - x, 4),
-  }));
-  const op = interpolate(t, [0, 8], [0, 1], { extrapolateRight: "clamp" });
-  return (
-    <span style={{ ...xt.stat, color, opacity: op, fontSize: 110 }}>
-      {prefix}{val.toLocaleString()}{suffix}
-    </span>
-  );
-};
+import { FlyIn, CountUp } from "../../components/XiaoYiOverlay";
 
 export const S02_Hook: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const labelY = spring({ frame, fps, from: -50, to: 0, durationInFrames: 18, config: { damping: 16 } });
+  const labelOp = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: "clamp" });
+
+  const strikeW = interpolate(frame, [55, 72], [0, 520], { extrapolateRight: "clamp" });
+
   return (
-    <div style={{
-      width: "100%", height: "100%",
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      padding: "0 60px", gap: 20,
-    }}>
-      <FlyIn delay={0} from="top">
-        <div style={{ ...xt.h2, color: xy.darkGray, textAlign: "center" }}>
-          今天帮你省下
-        </div>
-      </FlyIn>
+    <AbsoluteFill style={{ background: xy.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 180 }}>
+
+      {/* Red glow pool at bottom */}
+      <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", width: 900, height: 300, background: `radial-gradient(ellipse, ${xy.red}33 0%, transparent 70%)` }} />
 
       <div style={{ textAlign: "center" }}>
-        <CountUp target={200} prefix="¥" delay={10} />
-        <span style={{ ...xt.h1, color: xy.darkGray }}>–</span>
-        <CountUp target={500} suffix="元" delay={10} />
+        <div style={{ opacity: labelOp, transform: `translateY(${labelY}px)` }}>
+          <span style={{ ...xt.h2, color: xy.whiteMid, fontSize: 46 }}>今天帮你省下</span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 8, marginTop: 10 }}>
+          <CountUp target={200} prefix="¥" delay={12} color={xy.red} fontSize={150} />
+          <span style={{ ...xt.h1, color: xy.white, fontSize: 80, marginBottom: 20 }}>~</span>
+          <CountUp target={500} suffix="元" delay={12} color={xy.red} fontSize={150} />
+        </div>
+
+        {/* Strikethrough */}
+        <div style={{ position: "relative", display: "inline-block", marginTop: 16 }}>
+          <FlyIn delay={38} from="bottom">
+            <span style={{ ...xt.body, color: xy.whiteMid, fontSize: 38 }}>找人上门安装的价格</span>
+          </FlyIn>
+          <div style={{
+            position: "absolute", top: "50%", left: 0,
+            width: strikeW, height: 5,
+            background: xy.red, borderRadius: 3,
+            boxShadow: `0 0 12px ${xy.red}`,
+            transform: "translateY(-50%)",
+          }} />
+        </div>
+
+        <FlyIn delay={75} from="bottom">
+          <div style={{ ...xt.h3, color: xy.yellow, marginTop: 20, fontSize: 38, textShadow: `0 0 20px ${xy.yellow}` }}>
+            一定要点赞收藏！
+          </div>
+        </FlyIn>
       </div>
-
-      <FlyIn delay={45} from="bottom">
-        <div style={{
-          background: xy.redLight, borderRadius: 20,
-          padding: "20px 40px", marginTop: 10,
-          display: "flex", alignItems: "center", gap: 14,
-        }}>
-          <span style={{ fontSize: 36 }}>💡</span>
-          <span style={{ ...xt.body, color: xy.red, fontWeight: 700 }}>
-            找人上门安装的价格
-          </span>
-        </div>
-      </FlyIn>
-
-      <FlyIn delay={55} from="bottom">
-        <div style={{ ...xt.sm, color: xy.darkGray, textAlign: "center", marginTop: 8 }}>
-          一定要点赞收藏，避免找不到教程！
-        </div>
-      </FlyIn>
-    </div>
+    </AbsoluteFill>
   );
 };

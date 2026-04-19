@@ -1,24 +1,26 @@
-import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { xy, xt } from "../../xiaoyiStyles";
-import { FlyIn, PopIn } from "../../components/XiaoYiOverlay";
+import { Flash, useShake } from "../../components/XiaoYiOverlay";
 
-const Confetti: React.FC<{ i: number }> = ({ i }) => {
+const Particle: React.FC<{ i: number }> = ({ i }) => {
   const frame = useCurrentFrame();
-  const t = Math.max(0, frame - 20);
-  const colors = [xy.red, xy.orange, xy.yellow, xy.green, "#4F8EF7"];
-  const x = ((i * 137) % 100) - 50;
-  const y = -((t * (1.5 + (i % 3) * 0.5)) % 200);
-  const rot = t * (i % 2 === 0 ? 3 : -4) + i * 30;
-  const op = interpolate(t, [0, 5, 120, 150], [0, 1, 1, 0], { extrapolateRight: "clamp" });
+  const t = Math.max(0, frame - 18);
+  const colors = [xy.red, xy.orange, xy.yellow, xy.green, "#4F8EF7", "#BF5AF2"];
+  const angle = (i / 22) * Math.PI * 2;
+  const speed = 4 + (i % 4) * 1.5;
+  const dist = t * speed;
+  const x = Math.cos(angle) * dist;
+  const y = Math.sin(angle) * dist;
+  const op = interpolate(t, [0, 5, 50, 80], [0, 1, 0.8, 0], { extrapolateRight: "clamp" });
+  const size = 8 + (i % 4) * 6;
   return (
     <div style={{
-      position: "absolute",
-      width: 10 + (i % 3) * 4, height: 10 + (i % 3) * 4,
-      background: colors[i % 5],
-      borderRadius: i % 2 === 0 ? "50%" : 2,
-      left: `${40 + x * 0.3}%`,
-      top: `40%`,
-      transform: `translate(${x}px, ${y}px) rotate(${rot}deg)`,
+      position: "absolute", width: size, height: size,
+      borderRadius: i % 2 === 0 ? "50%" : 3,
+      background: colors[i % 6],
+      boxShadow: `0 0 ${size * 2}px ${colors[i % 6]}`,
+      left: "50%", top: "42%",
+      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
       opacity: op,
     }} />
   );
@@ -27,49 +29,42 @@ const Confetti: React.FC<{ i: number }> = ({ i }) => {
 export const S11_Step3: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const successScale = spring({ frame: Math.max(0, frame - 15), fps, from: 0.3, to: 1, durationInFrames: 28, config: { damping: 10, stiffness: 250 } });
-  const successOp = interpolate(frame, [15, 28], [0, 1], { extrapolateRight: "clamp" });
+  const shake = useShake(16, 16, 26);
+
+  const checkScale = spring({ frame: Math.max(0, frame - 14), fps, from: 0, to: 1, durationInFrames: 22, config: { damping: 7, stiffness: 380 } });
+  const checkOp = interpolate(frame, [14, 24], [0, 1], { extrapolateRight: "clamp" });
+
+  const textOp = interpolate(frame, [36, 50], [0, 1], { extrapolateRight: "clamp" });
+  const textS = spring({ frame: Math.max(0, frame - 36), fps, from: 0.5, to: 1, durationInFrames: 20, config: { damping: 12 } });
+
+  const glowPulse = Math.sin(frame * 0.15) * 0.3 + 1;
 
   return (
-    <div style={{
-      width: "100%", height: "100%",
-      display: "flex", flexDirection: "column",
+    <AbsoluteFill style={{
+      background: xy.bg, display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      padding: "0 56px", gap: 24, position: "relative",
+      transform: `translate(${shake.x}px,${shake.y}px)`,
     }}>
-      {Array.from({ length: 18 }).map((_, i) => <Confetti key={i} i={i} />)}
+      <Flash triggerFrame={14} color={xy.green} />
+      {Array.from({ length: 22 }).map((_, i) => <Particle key={i} i={i} />)}
 
-      <FlyIn delay={0} from="top">
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: "50%",
-            background: xy.green, color: xy.white,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            ...xt.h2, fontSize: 28,
-          }}>3</div>
-          <div style={{ ...xt.h1, color: xy.green, fontSize: 52 }}>启动成功！</div>
-        </div>
-      </FlyIn>
-
-      <div style={{ opacity: successOp, transform: `scale(${successScale})`, textAlign: "center" }}>
+      {/* Giant check */}
+      <div style={{ opacity: checkOp, transform: `scale(${checkScale})`, textAlign: "center" }}>
         <div style={{
-          fontSize: 100,
-          filter: "drop-shadow(0 8px 24px rgba(29,185,84,0.4))",
+          fontSize: 200,
+          filter: `drop-shadow(0 0 ${40 * glowPulse}px ${xy.green})`,
+          lineHeight: 1,
         }}>✅</div>
-        <div style={{ ...xt.h1, color: xy.green, marginTop: 8 }}>安装完成！</div>
       </div>
 
-      <FlyIn delay={45} from="bottom">
-        <div style={{
-          background: xy.green, borderRadius: 20,
-          padding: "20px 40px", textAlign: "center",
-          boxShadow: "0 8px 32px rgba(29,185,84,0.3)",
-        }}>
-          <div style={{ ...xt.body, color: xy.white, fontWeight: 700 }}>
-            🎉 恭喜！你的 AI 助手已就绪
-          </div>
+      <div style={{ opacity: textOp, transform: `scale(${textS})`, textAlign: "center", marginTop: 20 }}>
+        <div style={{ ...xt.hero, color: xy.green, fontSize: 96, textShadow: `0 0 50px ${xy.green}` }}>
+          安装成功！
         </div>
-      </FlyIn>
-    </div>
+        <div style={{ ...xt.h2, color: xy.white, marginTop: 16, fontSize: 50 }}>
+          🎉 你的 AI 助手已就绪
+        </div>
+      </div>
+    </AbsoluteFill>
   );
 };

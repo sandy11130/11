@@ -1,59 +1,45 @@
-import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { xy, xt } from "../../xiaoyiStyles";
-import { FlyIn, DrawLine } from "../../components/XiaoYiOverlay";
+import { FlyIn } from "../../components/XiaoYiOverlay";
 
 export const S16_Outro: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const logoScale = spring({ frame, fps, from: 0.6, to: 1, durationInFrames: 28, config: { damping: 14 } });
-  const logoOp = interpolate(frame, [0, 16], [0, 1], { extrapolateRight: "clamp" });
+  const logoS = spring({ frame, fps, from: 0.4, to: 1, durationInFrames: 24, config: { damping: 12 } });
+  const logoOp = interpolate(frame, [0, 14], [0, 1], { extrapolateRight: "clamp" });
+  const glowPulse = Math.sin(frame * 0.1) * 0.2 + 1;
 
   return (
-    <div style={{
-      width: "100%", height: "100%",
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      padding: "0 60px", gap: 24,
-    }}>
-      {/* Channel logo */}
-      <div style={{ opacity: logoOp, transform: `scale(${logoScale})`, textAlign: "center" }}>
+    <AbsoluteFill style={{ background: xy.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 120 }}>
+      <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", width: 800, height: 500, background: `radial-gradient(ellipse, ${xy.red}22 0%, transparent 65%)` }} />
+
+      <div style={{ opacity: logoOp, transform: `scale(${logoS})`, textAlign: "center", marginBottom: 30 }}>
         <div style={{
-          width: 100, height: 100, borderRadius: 28,
-          background: xy.red, margin: "0 auto 16px",
+          width: 110, height: 110, borderRadius: 28, background: xy.red, margin: "0 auto 16px",
           display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 12px 40px rgba(232,34,10,0.35)",
-          fontSize: 52,
+          fontSize: 60,
+          boxShadow: `0 0 ${50 * glowPulse}px ${xy.red}, 0 0 ${100 * glowPulse}px ${xy.red}44`,
         }}>🤖</div>
-        <div style={{ ...xt.h1, color: xy.black, fontSize: 56 }}>小易玩AI</div>
-        <FlyIn delay={20} from="bottom">
-          <DrawLine delay={20} width={200} />
-        </FlyIn>
-        <FlyIn delay={28} from="bottom">
-          <div style={{ ...xt.body, color: xy.darkGray, marginTop: 12 }}>
-            让普通人也能玩转 AI 工具
-          </div>
-        </FlyIn>
+        <div style={{ ...xt.h1, color: xy.white, fontSize: 68, textShadow: `0 0 30px rgba(255,255,255,0.4)` }}>小易玩AI</div>
+        <div style={{ ...xt.body, color: xy.whiteMid, marginTop: 10, fontSize: 32 }}>让普通人也能玩转 AI 工具</div>
       </div>
 
-      <FlyIn delay={38} from="bottom">
+      <FlyIn delay={36} from="bottom">
         <div style={{
-          background: xy.red, borderRadius: 20,
-          padding: "18px 40px", textAlign: "center",
-          boxShadow: "0 8px 32px rgba(232,34,10,0.3)",
-          width: "100%",
+          background: xy.red, borderRadius: 20, padding: "20px 50px",
+          textAlign: "center", width: "100%",
+          boxShadow: `0 0 40px ${xy.red}88`,
         }}>
-          <div style={{ ...xt.label, color: "rgba(255,255,255,0.75)", marginBottom: 6 }}>下期预告</div>
-          <div style={{ ...xt.h3, color: xy.white }}>
-            OpenClaw 接入飞书 + 微信 教程
-          </div>
+          <div style={{ ...xt.sm, color: "rgba(255,255,255,0.7)", marginBottom: 6, fontSize: 26 }}>下期预告</div>
+          <div style={{ ...xt.h3, color: xy.white, fontSize: 38 }}>OpenClaw 接入飞书 + 微信</div>
         </div>
       </FlyIn>
 
       <FlyIn delay={52} from="bottom">
-        <div style={{ ...xt.sm, color: xy.darkGray, textAlign: "center" }}>
-          关注账号 · 不错过每期教程
+        <div style={{ ...xt.sm, color: xy.whiteMid, textAlign: "center", marginTop: 18, fontSize: 28 }}>
+          关注账号 · 不错过每期教程 🔔
         </div>
       </FlyIn>
-    </div>
+    </AbsoluteFill>
   );
 };

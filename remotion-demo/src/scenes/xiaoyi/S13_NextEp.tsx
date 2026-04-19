@@ -1,65 +1,40 @@
-import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { xy, xt } from "../../xiaoyiStyles";
-import { FlyIn, PopIn } from "../../components/XiaoYiOverlay";
+import { FlyIn } from "../../components/XiaoYiOverlay";
 
-const AppIcon: React.FC<{ emoji: string; name: string; delay: number }> = ({ emoji, name, delay }) => {
+const AppIcon: React.FC<{ emoji: string; name: string; delay: number; color: string }> = ({ emoji, name, delay, color }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = Math.max(0, frame - delay);
-  const s = spring({ frame: t, fps, from: 0.5, to: 1, durationInFrames: 22, config: { damping: 12, stiffness: 280 } });
+  const s = spring({ frame: t, fps, from: 0.3, to: 1, durationInFrames: 20, config: { damping: 8, stiffness: 350 } });
   const op = interpolate(t, [0, 10], [0, 1], { extrapolateRight: "clamp" });
   return (
     <div style={{ opacity: op, transform: `scale(${s})`, textAlign: "center" }}>
-      <div style={{
-        width: 90, height: 90, borderRadius: 24,
-        background: xy.white, fontSize: 50,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-        margin: "0 auto 10px",
-      }}>{emoji}</div>
-      <div style={{ ...xt.sm, color: xy.black, fontWeight: 700 }}>{name}</div>
+      <div style={{ fontSize: 110, filter: `drop-shadow(0 0 30px ${color})`, lineHeight: 1 }}>{emoji}</div>
+      <div style={{ ...xt.h3, color, fontSize: 38, marginTop: 10, textShadow: `0 0 16px ${color}` }}>{name}</div>
     </div>
   );
 };
 
 export const S13_NextEp: React.FC = () => (
-  <div style={{
-    width: "100%", height: "100%",
-    display: "flex", flexDirection: "column",
-    alignItems: "center", justifyContent: "center",
-    padding: "0 60px", gap: 28,
-  }}>
+  <AbsoluteFill style={{ background: xy.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 120 }}>
     <FlyIn delay={0} from="top">
-      <div style={{ textAlign: "center" }}>
-        <div style={{
-          background: xy.red, color: xy.white, borderRadius: 100,
-          padding: "8px 28px", display: "inline-block",
-          ...xt.label, fontSize: 20, marginBottom: 14,
-        }}>下期预告</div>
-        <div style={{ ...xt.h1, color: xy.black, fontSize: 54 }}>
-          部署到手机上
+      <div style={{ textAlign: "center", marginBottom: 30 }}>
+        <div style={{ background: xy.red, borderRadius: 100, padding: "10px 36px", display: "inline-block", marginBottom: 14, boxShadow: `0 0 24px ${xy.red}` }}>
+          <span style={{ ...xt.sm, color: xy.white, fontSize: 28 }}>下期预告</span>
         </div>
-        <div style={{ ...xt.body, color: xy.darkGray, marginTop: 8 }}>
-          不用守着电脑，随时随地用 AI
-        </div>
+        <div style={{ ...xt.h1, color: xy.white, fontSize: 64 }}>部署到手机上</div>
+        <div style={{ ...xt.body, color: xy.whiteMid, marginTop: 10, fontSize: 34 }}>不用守着电脑，随时随地用 AI</div>
       </div>
     </FlyIn>
-
-    <div style={{ display: "flex", gap: 48, justifyContent: "center" }}>
-      <AppIcon emoji="💬" name="飞书" delay={22} />
-      <AppIcon emoji="🟢" name="微信" delay={34} />
+    <div style={{ display: "flex", gap: 80, justifyContent: "center" }}>
+      <AppIcon emoji="💬" name="飞书" delay={22} color="#3370FF" />
+      <AppIcon emoji="🟢" name="微信" delay={34} color={xy.green} />
     </div>
-
-    <FlyIn delay={50} from="bottom">
-      <div style={{
-        background: xy.redLight, borderRadius: 18,
-        padding: "18px 36px", textAlign: "center",
-        borderLeft: `6px solid ${xy.red}`,
-      }}>
-        <div style={{ ...xt.body, color: xy.red, fontWeight: 700 }}>
-          关注博主，下期继续教！
-        </div>
+    <FlyIn delay={52} from="bottom">
+      <div style={{ ...xt.h3, color: xy.red, marginTop: 28, fontSize: 38, textShadow: `0 0 20px ${xy.red}` }}>
+        关注博主，下期继续教！🔔
       </div>
     </FlyIn>
-  </div>
+  </AbsoluteFill>
 );

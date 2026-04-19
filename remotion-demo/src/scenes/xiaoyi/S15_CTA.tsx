@@ -1,58 +1,55 @@
-import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { xy, xt } from "../../xiaoyiStyles";
-import { FlyIn, PopIn } from "../../components/XiaoYiOverlay";
+import { Flash } from "../../components/XiaoYiOverlay";
 
-const CTAButton: React.FC<{ emoji: string; text: string; delay: number; color: string }> = ({
-  emoji, text, delay, color,
-}) => {
+const PulseBtn: React.FC<{ emoji: string; label: string; color: string; delay: number }> = ({ emoji, label, color, delay }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = Math.max(0, frame - delay);
-  const bounce = spring({ frame: t, fps, from: 0.5, to: 1, durationInFrames: 20, config: { damping: 8, stiffness: 350 } });
-  const wobble = Math.sin(frame * 0.12 + delay) * 2;
+  const s = spring({ frame: t, fps, from: 0.3, to: 1, durationInFrames: 20, config: { damping: 6, stiffness: 400 } });
   const op = interpolate(t, [0, 8], [0, 1], { extrapolateRight: "clamp" });
+  const pulse = Math.sin((frame - delay) * 0.13) * 0.06 + 1;
   return (
     <div style={{
-      opacity: op,
-      transform: `scale(${bounce}) rotate(${wobble}deg)`,
-      background: color, borderRadius: 24,
-      padding: "22px 0", flex: 1, textAlign: "center",
-      boxShadow: `0 8px 32px ${color}55`,
+      opacity: op, transform: `scale(${s * pulse})`,
+      flex: 1, textAlign: "center",
+      background: `rgba(${color === xy.red ? "255,59,48" : "255,149,0"},0.2)`,
+      border: `3px solid ${color}`,
+      borderRadius: 28, padding: "28px 0",
+      boxShadow: `0 0 ${50 * pulse}px ${color}88, inset 0 0 40px ${color}22`,
     }}>
-      <div style={{ fontSize: 52 }}>{emoji}</div>
-      <div style={{ ...xt.h3, color: xy.white, marginTop: 8, fontSize: 28 }}>{text}</div>
+      <div style={{ fontSize: 90, filter: `drop-shadow(0 0 20px ${color})`, lineHeight: 1 }}>{emoji}</div>
+      <div style={{ ...xt.h2, color, fontSize: 52, marginTop: 10, textShadow: `0 0 20px ${color}` }}>{label}</div>
     </div>
   );
 };
 
-export const S15_CTA: React.FC = () => (
-  <div style={{
-    width: "100%", height: "100%",
-    display: "flex", flexDirection: "column",
-    alignItems: "center", justifyContent: "center",
-    padding: "0 48px", gap: 24,
-  }}>
-    <FlyIn delay={0} from="top">
-      <div style={{ textAlign: "center" }}>
-        <div style={{ ...xt.h2, color: xy.black }}>怕以后找不到教程？</div>
-        <div style={{ ...xt.h1, color: xy.red, fontSize: 54 }}>马上做这两件事</div>
+export const S15_CTA: React.FC = () => {
+  const frame = useCurrentFrame();
+  const textOp = interpolate(frame, [0, 14], [0, 1], { extrapolateRight: "clamp" });
+
+  return (
+    <AbsoluteFill style={{ background: xy.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 48px" }}>
+      <Flash triggerFrame={0} color={xy.red} />
+
+      <div style={{ opacity: textOp, textAlign: "center", marginBottom: 36 }}>
+        <div style={{ ...xt.h2, color: xy.whiteMid, fontSize: 46 }}>怕以后找不到教程？</div>
+        <div style={{ ...xt.h1, color: xy.white, fontSize: 68 }}>马上做这两件事</div>
       </div>
-    </FlyIn>
 
-    <div style={{ display: "flex", gap: 20, width: "100%" }}>
-      <CTAButton emoji="👍" text="点赞" delay={16} color={xy.red} />
-      <CTAButton emoji="⭐" text="收藏" delay={28} color={xy.orange} />
-    </div>
+      <div style={{ display: "flex", gap: 24, width: "100%" }}>
+        <PulseBtn emoji="👍" label="点赞" color={xy.red} delay={14} />
+        <PulseBtn emoji="⭐" label="收藏" color={xy.orange} delay={26} />
+      </div>
 
-    <FlyIn delay={44} from="bottom">
-      <div style={{
-        background: xy.gray, borderRadius: 18, padding: "18px 32px",
-        width: "100%", textAlign: "center",
-      }}>
-        <div style={{ ...xt.body, color: xy.darkGray }}>
-          收藏了随时能回来复习 · 安装遇到问题评论区见
+      {interpolate(frame, [48, 62], [0, 1], { extrapolateRight: "clamp" }) > 0 && (
+        <div style={{
+          opacity: interpolate(frame, [48, 62], [0, 1], { extrapolateRight: "clamp" }),
+          marginTop: 28, ...xt.body, color: xy.whiteMid, textAlign: "center", fontSize: 30,
+        }}>
+          收藏了随时能回来复习 👆
         </div>
-      </div>
-    </FlyIn>
-  </div>
-);
+      )}
+    </AbsoluteFill>
+  );
+};

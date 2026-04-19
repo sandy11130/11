@@ -59,7 +59,7 @@ export const XiaoYiVideo: React.FC = () => {
 
       {/* Chapter lower-third - changes per scene */}
       {frame >= chapterFrom + 5 && frame < chapterFrom + 90 && (
-        <LowerThird title={chapter} delay={chapterFrom + 5} />
+        <LowerThird title={chapter} chapterStart={chapterFrom + 5} />
       )}
 
       {/* Scenes */}
