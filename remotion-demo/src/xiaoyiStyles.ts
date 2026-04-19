@@ -1,16 +1,16 @@
+// Dark theme overlay styles - black bg + bright colors for Screen blend mode in 剪映
 export const xy = {
-  red: "#E8220A",
-  orange: "#FF6B00",
-  yellow: "#FFD600",
-  green: "#1DB954",
+  red: "#FF3B30",
+  orange: "#FF9500",
+  yellow: "#FFD60A",
+  green: "#30D158",
   white: "#FFFFFF",
-  black: "#111111",
-  gray: "#F4F4F4",
-  darkGray: "#666666",
-  bg: "rgba(0,0,0,0)",          // transparent
-  cardBg: "#FFFFFF",
-  redLight: "#FFF0EE",
-  orangeLight: "#FFF4E6",
+  black: "#000000",        // transparent in Screen mode
+  dimText: "rgba(255,255,255,0.65)",
+  cardBg: "rgba(255,255,255,0.12)",
+  cardBorder: "rgba(255,255,255,0.2)",
+  redBg: "rgba(255,59,48,0.25)",
+  greenBg: "rgba(48,209,88,0.2)",
 };
 
 export const xf = {
