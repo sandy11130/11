@@ -1,6 +1,12 @@
-import { Composition } from "remotion";
+import { Composition, AbsoluteFill } from "remotion";
 import { CoolDemo } from "./Demo";
 import { XiaoYiVideo } from "./XiaoYiVideo";
+
+const XiaoYiWhiteBg: React.FC = () => (
+  <AbsoluteFill style={{ background: "#ffffff" }}>
+    <XiaoYiVideo />
+  </AbsoluteFill>
+);
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -16,6 +22,14 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="XiaoYiOverlay"
         component={XiaoYiVideo}
+        durationInFrames={2940}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="XiaoYiPreview"
+        component={XiaoYiWhiteBg}
         durationInFrames={2940}
         fps={30}
         width={1080}
