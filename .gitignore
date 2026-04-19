@@ -1,7 +1,5 @@
 node_modules/
-out/
 .remotion/
-*.mp4
 *.mov
 *.webm
 .env
