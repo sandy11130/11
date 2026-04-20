@@ -2,6 +2,7 @@ import { Composition, AbsoluteFill } from "remotion";
 import { CoolDemo } from "./Demo";
 import { XiaoYiVideo } from "./XiaoYiVideo";
 import { MyelcVideo } from "./myelc/MyelcVideo";
+import { YirenPreview, YIREN_TOTAL } from "./yiren/YirenPreview";
 
 const XiaoYiWhiteBg: React.FC = () => (
   <AbsoluteFill style={{ background: "#ffffff" }}>
@@ -40,6 +41,14 @@ export const RemotionRoot: React.FC = () => {
         id="MyelcStandalone"
         component={MyelcVideo}
         durationInFrames={670}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="YirenPreview"
+        component={YirenPreview}
+        durationInFrames={YIREN_TOTAL}
         fps={30}
         width={1080}
         height={1920}
